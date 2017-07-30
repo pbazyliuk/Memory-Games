@@ -47,103 +47,60 @@ window.onload = function() {
   buildList(optionValue);
 
   console.log(ul);
-  var counter = 0;
-  var bool = false;
-  var arr = [];
-  var arrV = [];
-  var arrR = [];
-  var scores = 0;
 
   ul.addEventListener("click", foo);
 
   var counter = 0;
-  var arr = [];
+  var arrTurnBack = [];
 
   function foo(e) {
     var target = e.target;
+    console.log("target", target);
 
-    console.log();
-    if (
-      target.tagName != "DIV" &&
-      !target.classList.contains("card-list-front")
-    ) {
+    if (counter > 2) {
+      counter = 0;
       return;
-    } else if (target.classList.contains("card-list-front")) {
+    } else {
       counter++;
-      if (counter > 2) return;
     }
-    console.log(counter);
 
+    console.log(counter);
+    if (
+      target.tagName !== "DIV" ||
+      !target.classList.contains("card-list-front") ||
+      counter > 2
+    ) {
+      counter--;
+      return;
+    }
+
+    //Image Flips backwards
     target.classList.remove("rotateBack");
     target.classList.add("rotate");
+    target.nextElementSibling.classList.remove("rotate-backside-back");
+    target.nextElementSibling.classList.add("rotate-backside");
 
-    if (e.target.nextElementSibling) {
-      e.target.nextElementSibling.classList.remove("rotate-backside-back");
-      e.target.nextElementSibling.classList.add("rotate-backside");
+    var turnBack = function() {
+      setTimeout(() => {
+        target.nextElementSibling.classList.remove("rotate-backside");
+        target.nextElementSibling.classList.add("rotate-backside-back");
+        target.classList.remove("rotate");
+        target.classList.add("rotateBack");
 
-      arrV.push(e.target.nextElementSibling.dataset.value);
-      console.log(arrV);
+        if (counter === 2) clear();
+      }, 1000);
+    };
 
-      var func = function(target, func1) {
-        return function() {
-          setTimeout(() => {
-            console.log(target);
-            target.nextElementSibling.classList.remove("rotate-backside");
-            target.classList.remove("rotate");
-            target.nextElementSibling.classList.add("rotate-backside-back");
-            target.classList.add("rotateBack");
-            if (func1) func1();
-          }, 1000);
-        };
-      };
+    arrTurnBack.push(turnBack);
 
-      function func1() {
-        setTimeout(() => {
-          counter = 0;
-          arr = [];
-        }, 1000);
-      }
+    function clear() {
+      counter = 0;
+      arrTurnBack = [];
+    }
 
-      arr.push(func(target, func1));
-
-      if (counter === 2) {
-        // if (arrV[arrV.lenght - 2] !== arrV[arrV.lenght - 1]) {
-        //   console.errro(arrV[arrV.lenght - 2] !== arrV[arrV.lenght - 1]);
-        //   arrV = [];
-        // } else {
-        //   counter = 0;
-        //   arr = [];
-
-        //   arrR = [].concat(arrV);
-        //   console.log(arrR);
-        //   var score = document.querySelector(".score");
-        //   console.error(score);
-        //   console.error(scores++);
-        //   score.innerHTML = scores;
-        //   if (scores === 8) {
-        //     alert("You win!!!");
-        //     scores = 0;
-        //     arrR = [];
-        //     location.reload();
-        //   }
-        //   return;
-        // }
-        // arr.push(func1);
-        arr[0]();
-        arr[1]();
-        // arr[2]();
-        console.log(arr);
-
-        // arr.forEach(item => {
-        //   item();
-        // });
-      }
-      // if (bool) {
-      //   setTimeout(() => {
-      //     counter = 0;
-      //   }, 1000);
-      // }
-      // bool = true;
+    if (counter === 2) {
+      arrTurnBack[0]();
+      arrTurnBack[1]();
     }
   }
 };

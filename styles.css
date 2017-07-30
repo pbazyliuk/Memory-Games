@@ -1,57 +1,53 @@
 .card-list {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
 .card-list-container {
-    width: 100px;
-    height: 100px;  
-    margin-right: 20px;
-    margin-bottom: 20px;
-    list-style: none;
-    line-height: 100px;
-    text-align: center;
+  width: 100px;
+  height: 100px;
+  margin-right: 20px;
+  margin-bottom: 20px;
+  list-style: none;
+  line-height: 100px;
+  text-align: center;
 }
 
 .card-list-item {
-    width: 100px;
-    height: 100px;
-
-
+  width: 100px;
+  height: 100px;
 }
 
 .rotate {
-    transform: rotateY(180deg);
-     transform-style: preserve-3d;
-    transition: all 1.0s linear;
+  transform: rotateY(180deg);
+  transform-style: preserve-3d;
+  transition: all 1.0s linear;
 }
 
 .rotateBack {
-    transform: rotateY(0);
-    transform-style: preserve-3d;
-    transition: all 1.0s linear;
+  transform: rotateY(0);
+  transform-style: preserve-3d;
+  transition: all 1.0s linear;
 }
 
 .card-list-front {
-   position: absolute;
-   z-index: 1;
-        background-color: green;
+  position: absolute;
+  z-index: 1;
+  background-color: green;
   width: 100px;
   height: 100px;
-   backface-visibility: hidden; 
+  backface-visibility: hidden;
 }
 
 .rotate-backside {
-     transform: rotateY(0deg);
-      transform-style: preserve-3d;
-    transition: all 1.0s linear; 
+  transform: rotateY(0deg);
+  transform-style: preserve-3d;
+  transition: all 1.0s linear;
 }
 
 .rotate-backside-back {
-     transform: rotateY(-180deg);
-        transform-style: preserve-3d;
-    transition: all 1.0s linear;  
-} 
-
+  transform: rotateY(-180deg);
+  transform-style: preserve-3d;
+  transition: all 1.0s linear;
+}
