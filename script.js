@@ -1,64 +1,149 @@
 window.onload = function() {
-	const ul = document.createElement('ul');
-	const select = document.getElementsByClassName('select-list-size');
-	var defaultValue = select[0].value;
+  const ul = document.querySelector(".card-list");
+  const select = document.querySelector(".list-size");
+  // let selectedIndex = 0;
+  let optionValue = select.value;
 
-	var listItems = '';
-	var listWidth = '480px';
+  select.addEventListener("change", changeSelectValue);
 
-	// var listString = ''
+  function changeSelectValue(e) {
+    optionValue = e.target.value;
+    console.log("selectedIndex", optionValue);
+    buildList(optionValue);
+  }
 
-	select[0].addEventListener('change', function(e) {
-		console.log(e.target.value);
-		defaultValue = e.target.value;
-		listItems = '';
-		buildList(defaultValue);
-	});
+  function buildList(val) {
+    console.log(typeof val);
+    switch (val) {
+      case "16":
+        ul.style.width = "480px";
+        break;
 
-	function buildList(val) {
-		//build cards-list
+      case "36":
+        ul.style.width = "720px";
+        break;
 
-		console.log(val);
-		for (let i = 0; i < val; i++) {
-			listItems +=
-				'<li class="card-list-item"><div class="card"><div class="card-front">111</div><div className="card-back"><img src="http://via.placeholder.com/100x100" alt=""/></div></div></li>';
-		}
+      case "64":
+        ul.style.width = "960px";
+        break;
+    }
 
-		switch (val) {
-			case '16':
-				listWidth = '480px';
-				break;
+    let liItems = "";
 
-			case '36':
-				listWidth = '720px';
-				break;
+    for (let i = 0; i < val; i++) {
+      liItems += `
+			<li class="card-list-container">
+				<div class="card-list-item">
+					<div class="card-list-front">Click me ${i}</div>
+					<div class="rotate-backside-back" data-value=${i %
+            8}><img src="http://via.placeholder.com/100x100"></div>
+				</div>
+			</li>`;
+    }
 
-			case '64':
-				listWidth = '1000px';
-				break;
+    ul.innerHTML = liItems;
+  }
 
-			default:
-				listWidth = '480px';
-				break;
-		}
+  buildList(optionValue);
 
-		console.log(val);
+  console.log(ul);
+  var counter = 0;
+  var bool = false;
+  var arr = [];
+  var arrV = [];
+  var arrR = [];
+  var scores = 0;
 
-		ul.innerHTML = listItems;
-		ul.setAttribute('class', 'card-list');
+  ul.addEventListener("click", foo);
 
-		ul.style.width = listWidth;
+  var counter = 0;
+  var arr = [];
 
-		document.body.appendChild(ul);
-	}
+  function foo(e) {
+    var target = e.target;
 
-	buildList(defaultValue);
+    console.log();
+    if (
+      target.tagName != "DIV" &&
+      !target.classList.contains("card-list-front")
+    ) {
+      return;
+    } else if (target.classList.contains("card-list-front")) {
+      counter++;
+      if (counter > 2) return;
+    }
+    console.log(counter);
 
-	// list.appendChild(listItems);
+    target.classList.remove("rotateBack");
+    target.classList.add("rotate");
 
-	// let selectIndex = 0;
+    if (e.target.nextElementSibling) {
+      e.target.nextElementSibling.classList.remove("rotate-backside-back");
+      e.target.nextElementSibling.classList.add("rotate-backside");
 
-	// let listCount = select[0].children[selectIndex].value;
+      arrV.push(e.target.nextElementSibling.dataset.value);
+      console.log(arrV);
 
-	console.log(defaultValue);
+      var func = function(target, func1) {
+        return function() {
+          setTimeout(() => {
+            console.log(target);
+            target.nextElementSibling.classList.remove("rotate-backside");
+            target.classList.remove("rotate");
+            target.nextElementSibling.classList.add("rotate-backside-back");
+            target.classList.add("rotateBack");
+            if (func1) func1();
+          }, 1000);
+        };
+      };
+
+      function func1() {
+        setTimeout(() => {
+          counter = 0;
+          arr = [];
+        }, 1000);
+      }
+
+      arr.push(func(target, func1));
+
+      if (counter === 2) {
+        // if (arrV[arrV.lenght - 2] !== arrV[arrV.lenght - 1]) {
+        //   console.errro(arrV[arrV.lenght - 2] !== arrV[arrV.lenght - 1]);
+        //   arrV = [];
+        // } else {
+        //   counter = 0;
+        //   arr = [];
+
+        //   arrR = [].concat(arrV);
+        //   console.log(arrR);
+        //   var score = document.querySelector(".score");
+        //   console.error(score);
+        //   console.error(scores++);
+        //   score.innerHTML = scores;
+        //   if (scores === 8) {
+        //     alert("You win!!!");
+        //     scores = 0;
+        //     arrR = [];
+        //     location.reload();
+        //   }
+        //   return;
+        // }
+        // arr.push(func1);
+        arr[0]();
+        arr[1]();
+        // arr[2]();
+        console.log(arr);
+
+        // arr.forEach(item => {
+        //   item();
+        // });
+      }
+      // if (bool) {
+      //   setTimeout(() => {
+      //     counter = 0;
+      //   }, 1000);
+      // }
+      // bool = true;
+    }
+  }
 };

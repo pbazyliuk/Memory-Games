@@ -2,45 +2,56 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    
+}
+
+.card-list-container {
+    width: 100px;
+    height: 100px;  
+    margin-right: 20px;
+    margin-bottom: 20px;
+    list-style: none;
+    line-height: 100px;
+    text-align: center;
 }
 
 .card-list-item {
-    list-style: none;
-    margin-left: 20px;
-    margin-bottom: 20px;
-    perspective: 1000;
-    position: relative;
-    z-index: 1;
     width: 100px;
     height: 100px;
+
+
 }
 
-.card {
-    /* width: 100%;
-    height: 100%; */
-    width: 100px;
-    height: 100px;
-    background: green;
+.rotate {
+    transform: rotateY(180deg);
+     transform-style: preserve-3d;
+    transition: all 1.0s linear;
+}
+
+.rotateBack {
+    transform: rotateY(0);
     transform-style: preserve-3d;
     transition: all 1.0s linear;
 }
 
-.card-list-item:hover .card {
-    transform: rotateY(180deg);
+.card-list-front {
+   position: absolute;
+   z-index: 1;
+        background-color: green;
+  width: 100px;
+  height: 100px;
+   backface-visibility: hidden; 
 }
 
-.card-front {
-    position: absolute;
-    backface-visibility: hidden;
+.rotate-backside {
+     transform: rotateY(0deg);
+      transform-style: preserve-3d;
+    transition: all 1.0s linear; 
 }
 
-.card-front.card-back {
-    display: block;
-    transform: rotateY(180deg);
-    box-sizing: border-box;
-    padding: 10px;
-    color: white;
-    text-align: center;
-    width: 100px;
-    height: 100px;
-}
+.rotate-backside-back {
+     transform: rotateY(-180deg);
+        transform-style: preserve-3d;
+    transition: all 1.0s linear;  
+} 
+
