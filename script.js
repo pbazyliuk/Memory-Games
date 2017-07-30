@@ -1,7 +1,8 @@
 window.onload = function() {
   const ul = document.querySelector(".card-list");
   const select = document.querySelector(".list-size");
-  // let selectedIndex = 0;
+  const score = document.querySelector(".score");
+
   let optionValue = select.value;
 
   select.addEventListener("change", changeSelectValue);
@@ -29,14 +30,36 @@ window.onload = function() {
     }
 
     let liItems = "";
+    let arrImg = [];
 
     for (let i = 0; i < val; i++) {
+      arrImg.push(i % (val / 2));
+    }
+
+    console.error(arrImg);
+
+    function shuffle(arrImg) {
+      var j, x, i;
+      for (i = arrImg.length; i; i--) {
+        j = Math.floor(Math.random() * i);
+        x = arrImg[i - 1];
+        arrImg[i - 1] = arrImg[j];
+        arrImg[j] = x;
+      }
+    }
+    shuffle(arrImg);
+    console.error(arrImg);
+    debugger;
+
+    for (let i = 0; i < arrImg.length; i++) {
+      console.log(arrImg);
+      //   i % (arrImg.length / 2));
       liItems += `
 			<li class="card-list-container">
 				<div class="card-list-item">
 					<div class="card-list-front">Click me ${i}</div>
-					<div class="rotate-backside-back" data-value=${i %
-            8}><img src="http://via.placeholder.com/100x100"></div>
+					<div class="rotate-backside-back" data-value=${arrImg[i]}>
+					<img src="images/${arrImg[i]}.png"></div>
 				</div>
 			</li>`;
     }
@@ -52,6 +75,9 @@ window.onload = function() {
 
   var counter = 0;
   var arrTurnBack = [];
+  var arrScores = [];
+  var arrTemp = [];
+  var scoresCounter = "";
 
   function foo(e) {
     var target = e.target;
@@ -92,13 +118,29 @@ window.onload = function() {
     };
 
     arrTurnBack.push(turnBack);
+    arrTemp.push(target.nextElementSibling.dataset.value);
 
     function clear() {
       counter = 0;
       arrTurnBack = [];
+      //arrScores = [];
     }
 
     if (counter === 2) {
+      if (arrTemp[arrTemp.length - 2] === arrTemp[arrTemp.length - 1]) {
+        arrScores.push(
+          arrTemp[arrTemp.length - 2],
+          arrTemp[arrTemp.length - 1]
+        );
+        score.innerHTML = ++scoresCounter;
+        console.error("arrScores", arrScores);
+        arrScores.length === 16
+          ? (alert("you win!"), location.reload(), (scoresCounter = 0))
+          : "";
+        clear();
+        return;
+      }
+
       arrTurnBack[0]();
       arrTurnBack[1]();
     }
