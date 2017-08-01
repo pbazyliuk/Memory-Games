@@ -1,67 +1,65 @@
 window.onload = function() {
-	const ul = document.querySelector('.card-list');
-	const select = document.querySelector('.list-size');
-	const score = document.querySelector('.score');
+  const ul = document.querySelector(".card-list");
+  const select = document.querySelector(".list-size");
+  const score = document.querySelector(".score");
 
-	let optionValue = select.value;
+  let optionValue = select.value;
 
-	select.addEventListener('change', changeSelectValue);
+  select.addEventListener("change", changeSelectValue);
 
-	function changeSelectValue(e) {
-		optionValue = e.target.value;
-		console.log('selectedIndex', optionValue);
+  function changeSelectValue(e) {
+    optionValue = e.target.value;
 
-		buildList(optionValue);
-	}
+    buildList(optionValue);
+  }
 
-	function setContainerWidth(val) {
-		switch (val) {
-			case '16':
-				ul.style.width = '480px';
-				break;
+  //set container width
+  function setContainerWidth(val) {
+    switch (val) {
+      case "16":
+        ul.style.width = "480px";
+        break;
 
-			case '36':
-				ul.style.width = '720px';
-				break;
+      case "36":
+        ul.style.width = "720px";
+        break;
 
-			case '64':
-				ul.style.width = '960px';
-				break;
-		}
-	}
+      case "64":
+        ul.style.width = "960px";
+        break;
+    }
+  }
 
-	function createIndForImg(val, arrImg) {
-		//push index for each image
-		console.log('createIndex');
-		for (let i = 0; i < val; i++) {
-			arrImg.push(i % (val / 2));
-		}
-	}
+  //create array of indexes for images identification
+  function createIndForImg(val, arrImg) {
+    for (let i = 0; i < val; i++) {
+      arrImg.push(i % (val / 2));
+    }
+  }
 
-	//shuffle image indexes
-	function shuffle(arrImg) {
-		var j, x, i;
-		for (i = arrImg.length; i; i--) {
-			j = Math.floor(Math.random() * i);
-			x = arrImg[i - 1];
-			arrImg[i - 1] = arrImg[j];
-			arrImg[j] = x;
-		}
-	}
+  //shuffle image indexes
+  function shuffle(arrImg) {
+    var j, x, i;
+    for (i = arrImg.length; i; i--) {
+      j = Math.floor(Math.random() * i);
+      x = arrImg[i - 1];
+      arrImg[i - 1] = arrImg[j];
+      arrImg[j] = x;
+    }
+  }
 
-	function buildList(val) {
-		let liItems = '';
-		let arrImg = [];
+  function buildList(val) {
+    let liItems = "";
+    let arrImg = [];
 
-		setContainerWidth(val);
+    setContainerWidth(val);
 
-		createIndForImg(val, arrImg);
+    createIndForImg(val, arrImg);
 
-		shuffle(arrImg);
+    shuffle(arrImg);
 
-		for (let i = 0; i < arrImg.length; i++) {
-			//   i % (arrImg.length / 2));
-			liItems += `
+    for (let i = 0; i < arrImg.length; i++) {
+      liItems += `
 			<li class="card-list-container">
 				<div class="card-list-item">
 					<div class="card-list-front">Click me ${i}</div>
@@ -69,83 +67,87 @@ window.onload = function() {
 					<img src="images/${arrImg[i]}.png"></div>
 				</div>
 			</li>`;
-		}
+    }
 
-		ul.innerHTML = liItems;
-	}
+    ul.innerHTML = liItems;
+  }
 
-	buildList(optionValue);
+  buildList(optionValue);
 
-	ul.addEventListener('click', onClickItem);
+  //Add listener for click
+  ul.addEventListener("click", onClickItem);
 
-	var counter = 0;
-	var arrTurnBack = [];
-	var arrScores = [];
-	var arrTemp = [];
-	var scoresCounter = '';
+  //rotate card
+  function rotateFrontCard(target) {
+    //Image Flips backwards
+    target.classList.remove("rotateBack");
+    target.classList.add("rotate");
+    target.nextElementSibling.classList.remove("rotate-backside-back");
+    target.nextElementSibling.classList.add("rotate-backside");
+  }
 
-	function onClickItem(e) {
-		var target = e.target;
-		console.log('target', target);
+  //rotate back card
+  function rotateBackCard(target) {
+    //Image Flips backwards
+    return function() {
+      setTimeout(() => {
+        target.nextElementSibling.classList.remove("rotate-backside");
+        target.nextElementSibling.classList.add("rotate-backside-back");
+        target.classList.remove("rotate");
+        target.classList.add("rotateBack");
+      }, 1000);
+    };
+  }
 
-		if (counter > 2) {
-			counter = 0;
-			return;
-		} else {
-			counter++;
-		}
+  //clear values for two open cards
+  function clearValues() {
+    counter = 0;
+    arrTurnBack = [];
+    arrValues = [];
+  }
 
-		if (
-			target.tagName !== 'DIV' ||
-			!target.classList.contains('card-list-front') ||
-			counter > 2
-		) {
-			counter--;
-			return;
-		}
+  var counter = 0;
+  var arrTurnBack = [];
+  var scores = 0;
+  var arrValues = [];
 
-		//Image Flips backwards
-		target.classList.remove('rotateBack');
-		target.classList.add('rotate');
-		target.nextElementSibling.classList.remove('rotate-backside-back');
-		target.nextElementSibling.classList.add('rotate-backside');
+  //click handler
+  function onClickItem(e) {
+    var target = e.target;
 
-		var turnBack = function() {
-			setTimeout(() => {
-				target.nextElementSibling.classList.remove('rotate-backside');
-				target.nextElementSibling.classList.add('rotate-backside-back');
-				target.classList.remove('rotate');
-				target.classList.add('rotateBack');
+    counter++;
+    if (
+      target.tagName !== "DIV" ||
+      !target.classList.contains("card-list-front") ||
+      counter > 2
+    ) {
+      counter--;
+      return;
+    }
 
-				if (counter === 2) clear();
-			}, 1000);
-		};
+    rotateFrontCard(target);
 
-		arrTurnBack.push(turnBack);
-		arrTemp.push(target.nextElementSibling.dataset.value);
+    arrTurnBack.push(rotateBackCard(target));
 
-		function clear() {
-			counter = 0;
-			arrTurnBack = [];
-		}
+    arrValues.push(target.nextElementSibling.dataset.value);
 
-		if (counter === 2) {
-			if (arrTemp[arrTemp.length - 2] === arrTemp[arrTemp.length - 1]) {
-				arrScores.push(
-					arrTemp[arrTemp.length - 2],
-					arrTemp[arrTemp.length - 1]
-				);
-				score.innerHTML = ++scoresCounter;
-				console.error('arrScores', arrScores);
-				arrScores.length === 16
-					? (alert('you win!'), location.reload(), (scoresCounter = 0))
-					: '';
-				clear();
-				return;
-			}
+    if (counter === 2 && arrValues[0] !== arrValues[1]) {
+      arrTurnBack.forEach(item => {
+        item();
+      });
+      setTimeout(() => {
+        clearValues(counter, arrTurnBack);
+      }, 1000);
+    } else if (arrValues[0] === arrValues[1]) {
+      score.innerHTML = ++scores;
+      clearValues(counter, arrTurnBack);
+    }
 
-			arrTurnBack[0]();
-			arrTurnBack[1]();
-		}
-	}
+    if (scores === 8) {
+      setTimeout(() => {
+        alert("you win!");
+        location.reload();
+      }, 2000);
+    }
+  }
 };
