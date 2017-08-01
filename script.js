@@ -1,60 +1,67 @@
 window.onload = function() {
-  const ul = document.querySelector(".card-list");
-  const select = document.querySelector(".list-size");
-  const score = document.querySelector(".score");
+	const ul = document.querySelector('.card-list');
+	const select = document.querySelector('.list-size');
+	const score = document.querySelector('.score');
 
-  let optionValue = select.value;
+	let optionValue = select.value;
 
-  select.addEventListener("change", changeSelectValue);
+	select.addEventListener('change', changeSelectValue);
 
-  function changeSelectValue(e) {
-    optionValue = e.target.value;
-    console.log("selectedIndex", optionValue);
-    buildList(optionValue);
-  }
+	function changeSelectValue(e) {
+		optionValue = e.target.value;
+		console.log('selectedIndex', optionValue);
 
-  function buildList(val) {
-    console.log(typeof val);
-    switch (val) {
-      case "16":
-        ul.style.width = "480px";
-        break;
+		buildList(optionValue);
+	}
 
-      case "36":
-        ul.style.width = "720px";
-        break;
+	function setContainerWidth(val) {
+		switch (val) {
+			case '16':
+				ul.style.width = '480px';
+				break;
 
-      case "64":
-        ul.style.width = "960px";
-        break;
-    }
+			case '36':
+				ul.style.width = '720px';
+				break;
 
-    let liItems = "";
-    let arrImg = [];
+			case '64':
+				ul.style.width = '960px';
+				break;
+		}
+	}
 
-    for (let i = 0; i < val; i++) {
-      arrImg.push(i % (val / 2));
-    }
+	function createIndForImg(val, arrImg) {
+		//push index for each image
+		console.log('createIndex');
+		for (let i = 0; i < val; i++) {
+			arrImg.push(i % (val / 2));
+		}
+	}
 
-    console.error(arrImg);
+	//shuffle image indexes
+	function shuffle(arrImg) {
+		var j, x, i;
+		for (i = arrImg.length; i; i--) {
+			j = Math.floor(Math.random() * i);
+			x = arrImg[i - 1];
+			arrImg[i - 1] = arrImg[j];
+			arrImg[j] = x;
+		}
+	}
 
-    function shuffle(arrImg) {
-      var j, x, i;
-      for (i = arrImg.length; i; i--) {
-        j = Math.floor(Math.random() * i);
-        x = arrImg[i - 1];
-        arrImg[i - 1] = arrImg[j];
-        arrImg[j] = x;
-      }
-    }
-    shuffle(arrImg);
-    console.error(arrImg);
-    debugger;
+	function buildList(val) {
+		let liItems = '';
+		let arrImg = [];
 
-    for (let i = 0; i < arrImg.length; i++) {
-      console.log(arrImg);
-      //   i % (arrImg.length / 2));
-      liItems += `
+		setContainerWidth(val);
+
+		createIndForImg(val, arrImg);
+
+		shuffle(arrImg);
+
+		for (let i = 0; i < arrImg.length; i++) {
+			//   i % (arrImg.length / 2));
+			liItems += `
 			<li class="card-list-container">
 				<div class="card-list-item">
 					<div class="card-list-front">Click me ${i}</div>
@@ -62,87 +69,83 @@ window.onload = function() {
 					<img src="images/${arrImg[i]}.png"></div>
 				</div>
 			</li>`;
-    }
+		}
 
-    ul.innerHTML = liItems;
-  }
+		ul.innerHTML = liItems;
+	}
 
-  buildList(optionValue);
+	buildList(optionValue);
 
-  console.log(ul);
+	ul.addEventListener('click', onClickItem);
 
-  ul.addEventListener("click", foo);
+	var counter = 0;
+	var arrTurnBack = [];
+	var arrScores = [];
+	var arrTemp = [];
+	var scoresCounter = '';
 
-  var counter = 0;
-  var arrTurnBack = [];
-  var arrScores = [];
-  var arrTemp = [];
-  var scoresCounter = "";
+	function onClickItem(e) {
+		var target = e.target;
+		console.log('target', target);
 
-  function foo(e) {
-    var target = e.target;
-    console.log("target", target);
+		if (counter > 2) {
+			counter = 0;
+			return;
+		} else {
+			counter++;
+		}
 
-    if (counter > 2) {
-      counter = 0;
-      return;
-    } else {
-      counter++;
-    }
+		if (
+			target.tagName !== 'DIV' ||
+			!target.classList.contains('card-list-front') ||
+			counter > 2
+		) {
+			counter--;
+			return;
+		}
 
-    console.log(counter);
-    if (
-      target.tagName !== "DIV" ||
-      !target.classList.contains("card-list-front") ||
-      counter > 2
-    ) {
-      counter--;
-      return;
-    }
+		//Image Flips backwards
+		target.classList.remove('rotateBack');
+		target.classList.add('rotate');
+		target.nextElementSibling.classList.remove('rotate-backside-back');
+		target.nextElementSibling.classList.add('rotate-backside');
 
-    //Image Flips backwards
-    target.classList.remove("rotateBack");
-    target.classList.add("rotate");
-    target.nextElementSibling.classList.remove("rotate-backside-back");
-    target.nextElementSibling.classList.add("rotate-backside");
+		var turnBack = function() {
+			setTimeout(() => {
+				target.nextElementSibling.classList.remove('rotate-backside');
+				target.nextElementSibling.classList.add('rotate-backside-back');
+				target.classList.remove('rotate');
+				target.classList.add('rotateBack');
 
-    var turnBack = function() {
-      setTimeout(() => {
-        target.nextElementSibling.classList.remove("rotate-backside");
-        target.nextElementSibling.classList.add("rotate-backside-back");
-        target.classList.remove("rotate");
-        target.classList.add("rotateBack");
+				if (counter === 2) clear();
+			}, 1000);
+		};
 
-        if (counter === 2) clear();
-      }, 1000);
-    };
+		arrTurnBack.push(turnBack);
+		arrTemp.push(target.nextElementSibling.dataset.value);
 
-    arrTurnBack.push(turnBack);
-    arrTemp.push(target.nextElementSibling.dataset.value);
+		function clear() {
+			counter = 0;
+			arrTurnBack = [];
+		}
 
-    function clear() {
-      counter = 0;
-      arrTurnBack = [];
-      //arrScores = [];
-    }
+		if (counter === 2) {
+			if (arrTemp[arrTemp.length - 2] === arrTemp[arrTemp.length - 1]) {
+				arrScores.push(
+					arrTemp[arrTemp.length - 2],
+					arrTemp[arrTemp.length - 1]
+				);
+				score.innerHTML = ++scoresCounter;
+				console.error('arrScores', arrScores);
+				arrScores.length === 16
+					? (alert('you win!'), location.reload(), (scoresCounter = 0))
+					: '';
+				clear();
+				return;
+			}
 
-    if (counter === 2) {
-      if (arrTemp[arrTemp.length - 2] === arrTemp[arrTemp.length - 1]) {
-        arrScores.push(
-          arrTemp[arrTemp.length - 2],
-          arrTemp[arrTemp.length - 1]
-        );
-        score.innerHTML = ++scoresCounter;
-        console.error("arrScores", arrScores);
-        arrScores.length === 16
-          ? (alert("you win!"), location.reload(), (scoresCounter = 0))
-          : "";
-        clear();
-        return;
-      }
-
-      arrTurnBack[0]();
-      arrTurnBack[1]();
-    }
-  }
+			arrTurnBack[0]();
+			arrTurnBack[1]();
+		}
+	}
 };
