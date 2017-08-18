@@ -1,19 +1,61 @@
 window.onload = function() {
+  //define variables
   const ul = document.querySelector(".card-list");
   const select = document.querySelector(".list-size");
   const score = document.querySelector(".score");
 
+  let counter = 0;
+  let arrTurnBack = [];
+  let scores = 0;
+  let arrValues = [];
+
   let optionValue = select.value;
 
+  //Add listener for selecting images list size
   select.addEventListener("change", changeSelectValue);
 
+  //Add listener for click on card
+  ul.addEventListener("click", onClickItem);
+
+  //rebuild img list on select option change
   function changeSelectValue(e) {
     optionValue = e.target.value;
-
     buildList(optionValue);
   }
 
-  //set container width
+  //build list of images
+  function buildList(val) {
+    let liItems = "";
+    let arrImgInd = [];
+
+    //set container style width
+    setContainerWidth(val);
+
+    //create array with same pair indexes
+    createIndForImg(val, arrImgInd);
+
+    //shuffle indexes in array
+    shuffle(arrImgInd);
+
+    for (let i = 0; i < arrImgInd.length; i++) {
+      liItems += `
+			<li class="card-list-container rotateBack">
+				<div class="card-list-item">
+					<div class="card-list-front rotate-back">Click me ${i}</div>
+          <div class="rotate-backside-back" data-value=${arrImgInd[i]}>
+            <img src="images/${arrImgInd[i]}.png">
+          </div>
+				</div>
+			</li>`;
+    }
+
+    ul.innerHTML = liItems;
+  }
+
+  //Call func for initial img list build
+  buildList(optionValue);
+
+  //set container style width
   function setContainerWidth(val) {
     switch (val) {
       case "16":
@@ -31,123 +73,85 @@ window.onload = function() {
   }
 
   //create array of indexes for images identification
-  function createIndForImg(val, arrImg) {
+  function createIndForImg(val, arrImgInd) {
     for (let i = 0; i < val; i++) {
-      arrImg.push(i % (val / 2));
+      arrImgInd.push(i % (val / 2));
     }
   }
 
   //shuffle image indexes
-  function shuffle(arrImg) {
-    var j, x, i;
-    for (i = arrImg.length; i; i--) {
-      j = Math.floor(Math.random() * i);
-      x = arrImg[i - 1];
-      arrImg[i - 1] = arrImg[j];
-      arrImg[j] = x;
+  function shuffle(arrImgInd) {
+    var randomIndFromRange, imgInd, i;
+    for (i = arrImgInd.length; i; i--) {
+      randomIndFromRange = Math.floor(Math.random() * i);
+      imgInd = arrImgInd[i - 1];
+      arrImgInd[i - 1] = arrImgInd[randomIndFromRange];
+      arrImgInd[randomIndFromRange] = imgInd;
     }
   }
-
-  function buildList(val) {
-    let liItems = "";
-    let arrImg = [];
-
-    setContainerWidth(val);
-
-    createIndForImg(val, arrImg);
-
-    shuffle(arrImg);
-
-    for (let i = 0; i < arrImg.length; i++) {
-      liItems += `
-			<li class="card-list-container">
-				<div class="card-list-item">
-					<div class="card-list-front">Click me ${i}</div>
-					<div class="rotate-backside-back" data-value=${arrImg[i]}>
-					<img src="images/${arrImg[i]}.png"></div>
-				</div>
-			</li>`;
-    }
-
-    ul.innerHTML = liItems;
-  }
-
-  buildList(optionValue);
-
-  //Add listener for click
-  ul.addEventListener("click", onClickItem);
 
   //rotate card
-  function rotateFrontCard(target) {
-    //Image Flips backwards
-    target.classList.remove("rotateBack");
-    target.classList.add("rotate");
-    target.nextElementSibling.classList.remove("rotate-backside-back");
-    target.nextElementSibling.classList.add("rotate-backside");
-  }
-
-  //rotate back card
-  function rotateBackCard(target) {
-    //Image Flips backwards
-    return function() {
-      setTimeout(() => {
-        target.nextElementSibling.classList.remove("rotate-backside");
-        target.nextElementSibling.classList.add("rotate-backside-back");
-        target.classList.remove("rotate");
-        target.classList.add("rotateBack");
-      }, 1000);
-    };
+  function rotateFrontCard(target, bool) {
+    let latency = 0;
+    if (bool) {
+      latency = 1000;
+    }
+    //Image Flips backwards with latency
+    setTimeout(() => {
+      target.classList.toggle("rotate-back");
+      target.nextElementSibling.classList.toggle("rotate-backside");
+      target.nextElementSibling.classList.toggle("rotate-backside-back");
+      target.classList.toggle("rotate");
+    }, latency);
   }
 
   //clear values for two open cards
   function clearValues() {
-    counter = 0;
     arrTurnBack = [];
     arrValues = [];
   }
-
-  var counter = 0;
-  var arrTurnBack = [];
-  var scores = 0;
-  var arrValues = [];
 
   //click handler
   function onClickItem(e) {
     var target = e.target;
 
-    counter++;
+    //check onclick event on some statements
     if (
       target.tagName !== "DIV" ||
-      !target.classList.contains("card-list-front") ||
-      counter > 2
+      (!target.nextElementSibling ||
+        target.nextElementSibling.classList.contains("rotate-backside")) ||
+      arrTurnBack.length > 2
     ) {
-      counter--;
       return;
     }
 
+    //rotate card
     rotateFrontCard(target);
 
-    arrTurnBack.push(rotateBackCard(target));
+    //func for back card rotate
+    let turnBackFunc = function() {
+      return rotateFrontCard(target, true);
+    };
 
+    //save func for probably card rotate back and card index values
+    arrTurnBack.push(turnBackFunc);
     arrValues.push(target.nextElementSibling.dataset.value);
 
-    if (counter === 2 && arrValues[0] !== arrValues[1]) {
-      arrTurnBack.forEach(item => {
-        item();
-      });
-      setTimeout(() => {
-        clearValues(counter, arrTurnBack);
-      }, 1000);
-    } else if (arrValues[0] === arrValues[1]) {
+    //check for cards indentity
+    if (arrTurnBack.length === 2 && arrValues[0] === arrValues[1]) {
       score.innerHTML = ++scores;
-      clearValues(counter, arrTurnBack);
+      clearValues();
+    } else if (arrTurnBack.length === 2 && arrValues[0] !== arrValues[1]) {
+      arrTurnBack.forEach(item => item());
+      clearValues();
     }
 
+    //end game when score reach 8
     if (scores === 8) {
       setTimeout(() => {
         alert("you win!");
         location.reload();
-      }, 2000);
+      }, 1000);
     }
   }
 };
