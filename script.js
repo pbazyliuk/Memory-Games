@@ -1,4 +1,4 @@
-window.onload = function() {
+window.onload = function () {
   //define variables
   const ul = document.querySelector(".card-list");
   const select = document.querySelector(".list-size");
@@ -114,13 +114,13 @@ window.onload = function() {
   //click handler
   function onClickItem(e) {
     var target = e.target;
-
+    console.log(arrTurnBack.length)
     //check onclick event on some statements
     if (
+      arrTurnBack.length === 2 ||
       target.tagName !== "DIV" ||
       (!target.nextElementSibling ||
-        target.nextElementSibling.classList.contains("rotate-backside")) ||
-      arrTurnBack.length > 2
+        target.nextElementSibling.classList.contains("rotate-backside"))
     ) {
       return;
     }
@@ -129,7 +129,7 @@ window.onload = function() {
     rotateFrontCard(target);
 
     //func for back card rotate
-    let turnBackFunc = function() {
+    let turnBackFunc = function () {
       return rotateFrontCard(target, true);
     };
 
@@ -140,10 +140,11 @@ window.onload = function() {
     //check for cards indentity
     if (arrTurnBack.length === 2 && arrValues[0] === arrValues[1]) {
       score.innerHTML = ++scores;
-      clearValues();
+      setTimeout(clearValues, 1500)
+      // clearValues();
     } else if (arrTurnBack.length === 2 && arrValues[0] !== arrValues[1]) {
       arrTurnBack.forEach(item => item());
-      clearValues();
+      setTimeout(clearValues, 1500)
     }
 
     //end game when score reach 8
